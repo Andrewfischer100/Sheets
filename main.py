@@ -2,31 +2,47 @@ import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from pathlib import Path
 
-filename = librosa.example('nutcracker')
-# audio_file_path = "Reference Scales_On C.mp3"
+from musictree.score import Score
+from musictree.part import Part
+from musictree.measure import Measure
+from musictree.staff import Staff
+from musictree.voice import Voice
+from musictree.beat import Beat
+from musictree.chord import Chord
+
+# Create score
+score = Score()
+part = score.add_child(Part('P1', name='Part 1'))
+measure = part.add_child(Measure(number=1))
+staff = measure.add_child(Staff(number=1))
+voice = staff.add_child(Voice(number=1))
+
+# filename = librosa.example('nutcracker')
+filename = "Reference Scales_On C.mp3"
+filePath = Path(str(Path(__file__).parent)  + "\\" + filename)
 
 print("Loading file: %s" % filename)
 loadStartTime = time.time()
-audio, samplerate = librosa.load(filename)
+audio, samplerate = librosa.load(filePath)
 loadEndTime = time.time()
 loadTime = loadEndTime - loadStartTime
 print("File loaded in %.2f seconds" % loadTime)
 
-print("Detecting tempo")
 tempo = librosa.feature.tempo(y=audio, sr=samplerate)
 print("Tempo = %d" % tempo[0])
 
-print("Detecting frequencies")
-freqStartTime = time.time()
+print("pyin")
+pyinStartTime = time.time()
 freqs, voiced_flag, voiced_probs = librosa.pyin(
     y=audio, 
     fmin=librosa.note_to_hz('C2'),
     fmax=librosa.note_to_hz('C7'),
     sr=samplerate)
-freqEndTime = time.time()
-freqTime = freqEndTime - freqStartTime
-print("Frequency detection done in %.2f seconds" % freqTime)
+pyinEndTime = time.time()
+pyinTime = pyinEndTime - pyinStartTime
+print("pyin done in %.2f seconds" % pyinTime)
 
 times = librosa.times_like(freqs)
 # print("Constructing fundamental frequency spectrogram")
@@ -46,10 +62,31 @@ times = librosa.times_like(freqs)
 # fig.show()
 # input("Press Enter to continue...")
 
+print("onset_detect")
+onsetDetectStartTime = time.time()
+onsetDetectionTimes = librosa.onset.onset_detect(y=audio, sr=samplerate, units='frames')
+onsetDetectEndTime = time.time()
+onsetDetectTime = onsetDetectEndTime - onsetDetectStartTime
+print("onset_detect done in %.2f seconds" % onsetDetectTime)
+# print(onsetDetectionTimes)
 
-notes = []
-onsetDetectionTimes = librosa.onset.onset_detect(y=audio, sr=samplerate, units='time')
+# quarterNoteInSeconds = 60.0 / float(tempo[0])
+# quarterNoteIndexSpacing = np.round(quarterNoteInSeconds / times[1])
+
+# print(quarterNoteIndexSpacing)
+
 for i in onsetDetectionTimes:
-        notes.append(librosa.hz_to_note(i))
-notes_string = ",".join(notes)
-print("Notes based on Onset Detection: " + notes_string)
+    # Sometimes the note at the onset is not the actual note we are looking for, i+1 is to just check the next frequency,
+    # which tends to be more accurate, maybe question mark?
+    #
+    # Alternatively we could check for the median frequency between two onsets, which may be more accurate 
+    freq = freqs[i+1]
+    if not np.isnan(freq):
+        midiValue = np.round(librosa.hz_to_midi(freq))
+        
+        beat = voice.add_child(Beat(quarter_duration=1))
+        beat.add_child(Chord(midiValue, 1))
+        
+xml_path = filePath.with_suffix('.xml')
+score.export_xml(xml_path)
+
