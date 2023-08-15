@@ -21,7 +21,7 @@ voice = staff.add_child(Voice(number=1))
 
 # filename = librosa.example('nutcracker')
 filename = "Reference Scales_On C.mp3"
-filePath = Path(str(Path(__file__).parent)  + "\\" + filename)
+filePath = Path(str(Path(__file__).parent) + "/" + filename)
 
 print("Loading file: %s" % filename)
 loadStartTime = time.time()
@@ -70,11 +70,10 @@ onsetDetectTime = onsetDetectEndTime - onsetDetectStartTime
 print("onset_detect done in %.2f seconds" % onsetDetectTime)
 # print(onsetDetectionTimes)
 
-# quarterNoteInSeconds = 60.0 / float(tempo[0])
-# quarterNoteIndexSpacing = np.round(quarterNoteInSeconds / times[1])
+quarterNoteInSeconds = 60.0 / float(tempo[0])
+quarterNoteIndexSpacing = np.round(quarterNoteInSeconds / times[1])
 
 # print(quarterNoteIndexSpacing)
-
 for i in onsetDetectionTimes:
     # Sometimes the note at the onset is not the actual note we are looking for, i+1 is to just check the next frequency,
     # which tends to be more accurate, maybe question mark?
@@ -86,7 +85,7 @@ for i in onsetDetectionTimes:
         
         beat = voice.add_child(Beat(quarter_duration=1))
         beat.add_child(Chord(midiValue, 1))
-        
+           
 xml_path = filePath.with_suffix('.xml')
 score.export_xml(xml_path)
 
