@@ -20,17 +20,17 @@ staff = measure.add_child(Staff(number=1))
 voice = staff.add_child(Voice(number=1))
 
 # filename = librosa.example('nutcracker')
-<<<<<<< HEAD
-filename = "/Reference Scales_On C.mp3"
-filePath = Path(str(Path(__file__).parent) + filename)
-=======
-filename = "Reference Scales_On C.mp3"
-filePath = Path(str(Path(__file__).parent) + "/" + filename)
->>>>>>> c7fe82ea1054f3ad5295817cfd9247b4947a7407
+#filename = "Reference Scales_On C.mp3"
+#filePath = Path(str(Path(__file__).parent) + "/" + filename)
 
+#loading app using librosa example files
+
+filename = 'robin'
+outputDirectory = Path(__file__).parent
 print("Loading file: %s" % filename)
 loadStartTime = time.time()
-audio, samplerate = librosa.load(filePath)
+audio, samplerate = librosa.load(librosa.example(filename))
+
 loadEndTime = time.time()
 loadTime = loadEndTime - loadStartTime
 print("File loaded in %.2f seconds" % loadTime)
@@ -76,6 +76,9 @@ print("onset_detect done in %.2f seconds" % onsetDetectTime)
 # print(onsetDetectionTimes)
 
 quarterNoteInSeconds = 60.0 / float(tempo[0])
+# Calculate quarter note index spacing
+
+print("Length of freqs array:", len(freqs))
 quarterNoteIndexSpacing = np.round(quarterNoteInSeconds / times[1])
 
 # print(quarterNoteIndexSpacing)
@@ -90,7 +93,10 @@ for i in onsetDetectionTimes:
         
         beat = voice.add_child(Beat(quarter_duration=1))
         beat.add_child(Chord(midiValue, 1))
-           
-xml_path = filePath.with_suffix('.xml')
-score.export_xml(xml_path)
 
+#Andy's machine using librosa example .xml output           
+#xml_path = filePath.with_suffix('.xml')
+xml_path = outputDirectory / (filename + ".xml")
+score.export_xml(xml_path)
+print("XML saved to: ", xml_path)
+print(xml_path)
