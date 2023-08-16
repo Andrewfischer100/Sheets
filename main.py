@@ -20,8 +20,8 @@ staff = measure.add_child(Staff(number=1))
 voice = staff.add_child(Voice(number=1))
 
 # filename = librosa.example('nutcracker')
-filename = "Reference Scales_On C.mp3"
-filePath = Path(str(Path(__file__).parent)  + "\\" + filename)
+filename = "/Reference Scales_On C.mp3"
+filePath = Path(str(Path(__file__).parent) + filename)
 
 print("Loading file: %s" % filename)
 loadStartTime = time.time()
