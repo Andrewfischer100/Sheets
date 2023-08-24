@@ -3,30 +3,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
+from timer import Timer
+
 filename = librosa.example('nutcracker')
 # audio_file_path = "Reference Scales_On C.mp3"
 
-print("Loading file: %s" % filename)
-loadStartTime = time.time()
-audio, samplerate = librosa.load(filename)
-loadEndTime = time.time()
-loadTime = loadEndTime - loadStartTime
-print("File loaded in %.2f seconds" % loadTime)
+with Timer("File loaded in {:0.4f} seconds"):
+    print("Loading file: %s" % filename)
+    audio, samplerate = librosa.load(filename)
 
 print("Detecting tempo")
 tempo = librosa.feature.tempo(y=audio, sr=samplerate)
 print("Tempo = %d" % tempo[0])
 
-print("Detecting frequencies")
-freqStartTime = time.time()
-freqs, voiced_flag, voiced_probs = librosa.pyin(
-    y=audio, 
-    fmin=librosa.note_to_hz('C2'),
-    fmax=librosa.note_to_hz('C7'),
-    sr=samplerate)
-freqEndTime = time.time()
-freqTime = freqEndTime - freqStartTime
-print("Frequency detection done in %.2f seconds" % freqTime)
+with Timer("Frequency detection done in {:0.4f} seconds"):
+    print("Detecting frequencies")
+    freqs, voiced_flag, voiced_probs = librosa.pyin(
+        y=audio,
+        fmin=librosa.note_to_hz('C2'),
+        fmax=librosa.note_to_hz('C7'),
+        sr=samplerate)
 
 times = librosa.times_like(freqs)
 # print("Constructing fundamental frequency spectrogram")
