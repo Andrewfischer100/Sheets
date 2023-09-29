@@ -12,9 +12,12 @@ from musictree.voice import Voice
 from musictree.beat import Beat
 from musictree.chord import Chord
 
+#9.29.2023
+
 # Create score
 score = Score()
 part = score.add_child(Part('P1', name='Part 1'))
+part.add_measure()
 measure = part.add_child(Measure(number=1))
 staff = measure.add_child(Staff(number=1))
 voice = staff.add_child(Voice(number=1))
